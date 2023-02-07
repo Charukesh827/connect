@@ -1,8 +1,8 @@
 import sqlite3
 from anytree import Node,RenderTree,search
-c=sqlite3.connect('conn.bd')
+c=sqlite3.connect('conn.db')
 cursor=c.cursor()
-'''cursor.execute('DROP TABLE details')
+cursor.execute('DROP TABLE details')
 c.execute("""CREATE TABLE details (
     id char(6) NOT NULL PRIMARY KEY,
     password char(20) NOT NULL,
@@ -37,9 +37,10 @@ cursor.execute('DROP TABLE id_detail')
 c.execute("""CREATE TABLE id_detail (
     insta char(50),
     id char(6));""")
+cc=-1
 cursor.execute('DROP TABLE y')
 cursor.execute("CREATE TABLE y(value int);")
-cursor.execute("INSERT INTO y VALUES(65535)")'''
+cursor.execute("INSERT INTO y VALUES(65535)")
 class details:
     #To enter values into details table
     def into_values(self,name,passwd,insta,fb,tweet):
@@ -102,16 +103,16 @@ class details:
         m=c_list[10],n=c_list[11],o=c_list[12],p=c_list[13],q=c_list[14],r=c_list[15],s=c_list[16],t=c_list[17],u=c_list[18],v=c_list[19]))
         return 1
     #To find the contacts from person 1 to person 2
-    def find_contact(self,id_1,id_2):
+    def find_contact(self,id_1,id_2,c):
         child=[]
         child.append(Node(id_2))
         count=1
         check=[id_2]
-        print("check: ",check)
+        #print("check: ",check)
         note=0
         i=0
         l=0
-        while note==0:
+        while note<=c:
             cursor.execute("""SELECT id FROM contacts WHERE (c1="{id2}" OR c2="{id2}" OR c3="{id2}" OR
                           c4="{id2}" OR c5="{id2}" OR c6="{id2}" OR c7="{id2}" OR c8="{id2}" OR 
                           c9="{id2}" OR c10="{id2}" OR c11="{id2}" OR c12="{id2}" OR c13="{id2}" OR
@@ -119,17 +120,27 @@ class details:
                           c19="{id2}" OR c20="{id2}");""".format(id2=check[l]))
             l+=1
             x=cursor.fetchall()
-            print("----",x[0])
-            for j in x[0]:
-                if j in check:
-                    x[0].remove(j)
-            check.extend(x[0])
-            for j in x[0]:
-                child.append(Node(j,parent=child[i]))
-            count+=1
-            i+=1
+            #for j in x:
+            #    print("----",j)
+            for j in x:
+                if j[0] in check:
+                    list(x).remove(j)
+            for j in x:
+                check.append(j[0])
             if id_1 in check:
                 note+=1
+                if(note<c+1):
+                    for j in x:
+                        if(j[0]==id_1):
+                            x.remove(j)
+                    check.remove(id_1)
+            for j in x:
+                child.append(Node(j[0],parent=child[i]))
+            count+=1
+            i+=1
+            #print("check: ",check)
+            print(RenderTree(child[0]))
+            
         k=str(search.findall(child[0],filter_=lambda node: node.name in (id_1))).split("/")
         result=[]
         for i in range(1,len(k)-1):
@@ -138,39 +149,70 @@ class details:
         h=len(k[1])
         result.append(g[:h])
         return result
+    def times(self,id_1,id_2):
+        global cc
+        cc+=1
+        return self.find_contact(id_1,id_2,cc)
+
+
+
+c.commit() 
+
+
 d=details()
-'''x=[]
+x=[]
 x.append(d.into_values('virat_kohli','hello@987','virat.kohli','virat_fb','virat__official'))
 x.append(d.into_values('Rohit_sharma','jihu#234','rohit.official','rohit_sharma',None))
 x.append(d.into_values('rishab_pant','ramobo$127','rishab.pant',None,'rihab.official'))
 x.append(d.into_values('mahesh_babu','reo$2358','urstruely_mahesh',None,None))
 x.append(d.into_values('bill_gates','juty#1278','bill.official','billgates','bill.official'))
 c.commit()
-print(x)
+#print(x)
 cursor.execute("""SELECT * FROM details""")
 h=cursor.fetchall()
-print(h)
+#print('------------',h)
 cursor.execute("""SELECT * FROM id_detail""")
 u=cursor.fetchall()
-print("-",u) 
+#print("-",u) 
 for i in u:
     print(d.get_value(i[1])) 
-x=['rohit.official','bill.official','urstruely_mahesh','hello','kiddo','paleee','sleepy']
+x=['rohit.official','rishab.pant']
 d.into_contact('virat.kohli',x)
 cursor.execute("""SELECT * FROM id_detail""")
 u=cursor.fetchall()
-print("-",u)
+#print("-",u)
+cursor.execute("""SELECT * FROM contacts""")
+u=cursor.fetchall()
+#print("$",u)
+
+x=['urstruely_mahesh']
+d.into_contact('rohit.official',x)
+cursor.execute("""SELECT * FROM id_detail""")
+u=cursor.fetchall()
+#print("----",u)
+cursor.execute("""SELECT * FROM contacts""")
+u=cursor.fetchall()
+#print("$",u)
+
+x=['urstruely_mahesh']
+d.into_contact('rishab.pant',x)
+cursor.execute("""SELECT * FROM id_detail""")
+u=cursor.fetchall()
+#print("----",u)
+cursor.execute("""SELECT * FROM contacts""")
+u=cursor.fetchall()
+#print("$",u)
+
+x=['bill.official']
+d.into_contact('urstruely_mahesh',x)
+cursor.execute("""SELECT * FROM id_detail""")
+u=cursor.fetchall()
+#print("----",u)
 cursor.execute("""SELECT * FROM contacts""")
 u=cursor.fetchall()
 print("$",u)
 
-x=['daccee','h','j','q','w','e','r','t','y','u']
-d.into_contact('sleepy',x)
-cursor.execute("""SELECT * FROM id_detail""")
-u=cursor.fetchall()
-print("-",u)
-cursor.execute("""SELECT * FROM contacts""")
-u=cursor.fetchall()
-print("$",u)'''
-print(d.find_contact('0xfff4','0xfffa'))
-c.commit()     
+x=d.times('0xffff','0xfffb')
+print(x)
+x=d.times('0xffff','0xfffb')
+print(x)
