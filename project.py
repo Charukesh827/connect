@@ -7,6 +7,7 @@ c.execute("""CREATE TABLE details (
     id char(6) NOT NULL PRIMARY KEY,
     password char(20) NOT NULL,
     name char(30) NOT NULL,
+    qualification char(30) NOT NULL,
     insta char(50) NOT NULL,
     fb char(50),
     tweet char(50));""")
@@ -43,29 +44,29 @@ cursor.execute("CREATE TABLE y(value int);")
 cursor.execute("INSERT INTO y VALUES(65535)")
 class details:
     #To enter values into details table
-    def into_values(self,name,passwd,insta,fb,tweet):
+    def into_values(self,name,passwd,q,insta,fb,tweet):
         id_=self.id_generator(insta)
         if fb==tweet==None:
             string="""INSERT INTO details VALUES(
-                "{id_}","{passwd}","{name}","{insta}",NULL,NULL);"""
-            sql=string.format(id_=id_,passwd=passwd,name=name,insta=insta)
+                "{id_}","{passwd}","{name}","{q}","{insta}",NULL,NULL);"""
+            sql=string.format(id_=id_,passwd=passwd,name=name,q=q,insta=insta)
         elif fb==None:
             string="""INSERT INTO details VALUES(
-                "{id_}","{passwd}","{name}","{insta}",NULL,"{tweet}");"""
-            sql=string.format(id_=id_,passwd=passwd,name=name,insta=insta,tweet=tweet)
+                "{id_}","{passwd}","{name}","{q}","{insta}",NULL,"{tweet}");"""
+            sql=string.format(id_=id_,passwd=passwd,name=name,q=q,insta=insta,tweet=tweet)
         elif tweet==None:
             string="""INSERT INTO details VALUES(
-                "{id_}","{passwd}","{name}","{insta}","{fb}",NULL);"""
-            sql=string.format(id_=id_,passwd=passwd,name=name,insta=insta,fb=fb)
+                "{id_}","{passwd}","{name}","{q}","{insta}","{fb}",NULL);"""
+            sql=string.format(id_=id_,passwd=passwd,name=name,q=q,insta=insta,fb=fb)
         else:
             string="""INSERT INTO details VALUES(
-                "{id_}","{passwd}","{name}","{insta}","{fb}","{tweet}");"""
-            sql=string.format(id_=id_,passwd=passwd,name=name,insta=insta,fb=fb,tweet=tweet)
+                "{id_}","{passwd}","{name}","{q}","{insta}","{fb}","{tweet}");"""
+            sql=string.format(id_=id_,passwd=passwd,name=name,q=q,insta=insta,fb=fb,tweet=tweet)
         cursor.execute(sql)
         return id
     #to get values from details table with id
     def get_value(self,id_):
-        cursor.execute("""SELECT id,name,insta,fb,tweet FROM details WHERE (id="{id_}");""".format(id_=id_))
+        cursor.execute("""SELECT id,name,qualification,insta,fb,tweet FROM details WHERE (id="{id_}");""".format(id_=id_))
         data=cursor.fetchall()
         return data
     #To generate or get id for insta
@@ -161,21 +162,21 @@ c.commit()
 
 d=details()
 x=[]
-x.append(d.into_values('virat_kohli','hello@987','virat.kohli','virat_fb','virat__official'))
-x.append(d.into_values('Rohit_sharma','jihu#234','rohit.official','rohit_sharma',None))
-x.append(d.into_values('rishab_pant','ramobo$127','rishab.pant',None,'rihab.official'))
-x.append(d.into_values('mahesh_babu','reo$2358','urstruely_mahesh',None,None))
-x.append(d.into_values('bill_gates','juty#1278','bill.official','billgates','bill.official'))
+x.append(d.into_values('virat_kohli','hello@987','cricketer','virat.kohli','virat_fb','virat__official'))
+x.append(d.into_values('Rohit_sharma','jihu#234','cricketer','rohit.official','rohit_sharma',None))
+x.append(d.into_values('rishab_pant','ramobo$127','cricketer','rishab.pant',None,'rihab.official'))
+x.append(d.into_values('mahesh_babu','reo$2358','actor','urstruely_mahesh',None,None))
+x.append(d.into_values('bill_gates','juty#1278','business','bill.official','billgates','bill.official'))
 c.commit()
 #print(x)
 cursor.execute("""SELECT * FROM details""")
 h=cursor.fetchall()
-#print('------------',h)
+print('------------',h)
 cursor.execute("""SELECT * FROM id_detail""")
 u=cursor.fetchall()
 #print("-",u) 
-for i in u:
-    print(d.get_value(i[1])) 
+# for i in u:
+#     print(d.get_value(i[1])) 
 x=['rohit.official','rishab.pant']
 d.into_contact('virat.kohli',x)
 cursor.execute("""SELECT * FROM id_detail""")
